@@ -6,18 +6,18 @@ defmodule WineCellar do
       rose: "Fermented with some skin contact, but not enough to qualify as a red wine."
     ]
   end
+  def filter(cellar, color, opts \\ []) do
+    cellar
+    |> Keyword.get_values(color)
+    |> apply_if_key_exists(opts, :year, &filter_by_year/2)
+    |> apply_if_key_exists(opts, :country, &filter_by_country/2)
+  end
 
-  def filter(cellar, color, opts \\ [])
-
-  def filter(cellar, color, opts) do
-    case opts do
-      [] -> Keyword.get_values(cellar, color)
-      [year: _] ->
-        Keyword.get_values(cellar, color)
-        |> filter_by_year(opts[:year])
-      [country: _] ->
-        Keyword.get_values(cellar, color)
-        |> filter_by_country(opts[:country])
+  defp apply_if_key_exists(list, opts, key, fun) do
+    if Keyword.has_key?(opts, key) do
+      fun.(list, opts[key])
+    else
+      list
     end
   end
 
