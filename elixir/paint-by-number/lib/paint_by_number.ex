@@ -17,14 +17,14 @@ defmodule PaintByNumber do
     <<pixel_color_index::size(color_bits), picture::bitstring>>
   end
 
-  def get_first_pixel(picture, _) when picture == <<>>, do: nil
+  def get_first_pixel(<<>>, _), do: nil
   def get_first_pixel(picture, color_count) do
     color_bits = palette_bit_size(color_count)
     <<head::size(color_bits), _::bitstring>> = picture
     head
   end
 
-  def drop_first_pixel(picture, _) when picture == <<>>, do: picture
+  def drop_first_pixel(<<>>, _), do: <<>>
   def drop_first_pixel(picture, color_count) do
     color_bits = palette_bit_size(color_count)
     <<_::size(color_bits), tail::bitstring>> = picture
