@@ -31,6 +31,12 @@ defmodule LibraryFees do
   end
 
   def calculate_late_fee(checkout, return, rate) do
-    # Please implement the calculate_late_fee/3 function
+    checkout = return_date(datetime_from_string(checkout))
+    return = datetime_from_string(return)
+    fee = days_late(checkout, return) * rate
+    cond do
+      monday?(return) -> div(fee, 2)
+      true -> fee
+    end
   end
 end
