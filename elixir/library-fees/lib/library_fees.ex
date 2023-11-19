@@ -1,29 +1,25 @@
 defmodule LibraryFees do
   def datetime_from_string(string) do
-    {_, date_time} = NaiveDateTime.from_iso8601(string)
-    date_time
+    NaiveDateTime.from_iso8601!(string)
   end
 
   def before_noon?(datetime) do
-    Time.before?(NaiveDateTime.to_time(datetime), ~T[12:00:00])
+    datetime.hour < 12
   end
 
   def return_date(checkout_datetime) do
-    checkout_datetime
-    |> before_noon?
-    |> case do
-        true -> NaiveDateTime.to_date(checkout_datetime)
-          |> Date.add(28)
-        false -> NaiveDateTime.to_date(checkout_datetime)
-          |> Date.add(29)
-      end
+    checkout_date = NaiveDateTime.to_date(checkout_datetime)
+
+    case before_noon?(checkout_datetime) do
+      true -> Date.add(checkout_date, 28)
+      false -> Date.add(checkout_date, 29)
+    end
   end
 
   def days_late(planned_return_date, actual_return_datetime) do
-    cond do
-      Date.diff(actual_return_datetime, planned_return_date) <= 0 -> 0
-      true -> Date.diff(actual_return_datetime, planned_return_date)
-    end
+    actual_return_datetime
+    |> Date.diff(planned_return_date)
+    |> max(0)
   end
 
   def monday?(datetime) do
