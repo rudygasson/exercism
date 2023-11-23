@@ -3,8 +3,8 @@ defmodule BasketballWebsite do
     do_extract_from_path(data, String.split(path, "."))
   end
 
-  def do_extract_from_path(data, []), do: data
-  def do_extract_from_path(data, [h | t]) do
+  defp do_extract_from_path(data, []), do: data
+  defp do_extract_from_path(data, [h | t]) do
     do_extract_from_path(data[h], t)
   end
 
