@@ -16,7 +16,8 @@ defmodule BoutiqueInventory do
   end
 
   def increase_quantity(item, count) do
-    # Please implement the increase_quantity/2 function
+    increase = fn {k,v} -> {k, v + count} end
+    Map.update(item, :quantity_by_size, 0, &(Map.new(&1, increase)))
   end
 
   def total_quantity(item) do
