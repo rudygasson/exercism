@@ -8,10 +8,7 @@ defmodule FileSniffer do
   ]
 
   def type_from_extension(extension) do
-    case Enum.find(@file_types, fn {ext, _, _} -> ext == extension end) do
-      {_, media_type, _} -> media_type
-      _ -> nil
-    end
+    extension_map()[extension]
   end
 
   def type_from_binary(file_binary) do
@@ -37,6 +34,11 @@ defmodule FileSniffer do
       type && type == type_from_binary(file_binary) -> {:ok, type}
       true -> {:error, "Warning, file format and file extension do not match."}
     end
+  end
+
+  defp extension_map do
+    @file_types
+    |> Map.new(fn {extension, media_type, _} -> {extension, media_type} end)
   end
 
   defp get_media_type(param) do
