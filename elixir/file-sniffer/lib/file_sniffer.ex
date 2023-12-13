@@ -12,19 +12,8 @@ defmodule FileSniffer do
   end
 
   def type_from_binary(file_binary) do
-    if is_binary(file_binary) do
-      case Enum.find(@file_types, fn {_, _, signature} ->
-             if byte_size(signature) <= byte_size(file_binary) do
-               <<sig::binary-size(byte_size(signature)), _::binary>> = file_binary
-               sig == signature
-             end
-           end) do
-        {_, media_type, _} -> media_type
-        _ -> nil
-      end
-    else
-      nil
-    end
+    Enum.find(signature_list(), &check_signature(file_binary, &1))
+    |> get_media_type
   end
 
   def verify(file_binary, extension) do
@@ -41,9 +30,20 @@ defmodule FileSniffer do
     |> Map.new(fn {extension, media_type, _} -> {extension, media_type} end)
   end
 
-  defp get_media_type(param) do
-    case param do
-      _ -> nil
+  defp signature_list do
+    Enum.map(@file_types, fn {_, _, signature} -> signature end)
+  end
+
+  defp get_media_type(signature) do
+    @file_types
+    |> Map.new(fn {_, media_type, signature} -> {signature, media_type} end)
+    |> Map.get(signature)
+  end
+
+  defp check_signature(file_binary, signature) do
+    case file_binary do
+      <<sig::binary-size(byte_size(signature)), _::binary>> -> sig == signature
+      _ -> false
     end
   end
 end
