@@ -8,12 +8,15 @@ defmodule FileSniffer do
   ]
 
   def type_from_extension(extension) do
-    extension_map()[extension]
+    Enum.into(@file_types, %{}, &extension_map/1)[extension]
   end
 
   def type_from_binary(file_binary) do
-    Enum.find(signature_list(), &check_signature(file_binary, &1))
-    |> get_media_type
+    Enum.find(@file_types, &check_signature(file_binary, elem(&1, 2)))
+    |> case do
+      {_, type, _} -> type
+      _ -> nil
+    end
   end
 
   def verify(file_binary, extension) do
@@ -25,13 +28,14 @@ defmodule FileSniffer do
     end
   end
 
-  defp extension_map do
-    @file_types
-    |> Map.new(fn {extension, media_type, _} -> {extension, media_type} end)
-  end
+  defp extension_map({extension, media_type, _}), do: {extension, media_type}
+  defp type({_, media_type, _}), do: media_type
 
-  defp signature_list do
-    Enum.map(@file_types, fn {_, _, signature} -> signature end)
+  defp check_signature(file_binary, signature) do
+    case file_binary do
+      <<head::binary-size(byte_size(signature)), _::binary>> -> head == signature
+      _ -> false
+    end
   end
 
   defp get_media_type(signature) do
@@ -40,10 +44,5 @@ defmodule FileSniffer do
     |> Map.get(signature)
   end
 
-  defp check_signature(file_binary, signature) do
-    case file_binary do
-      <<sig::binary-size(byte_size(signature)), _::binary>> -> sig == signature
-      _ -> false
-    end
-  end
+
 end
