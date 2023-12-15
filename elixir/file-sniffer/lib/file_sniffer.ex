@@ -22,9 +22,9 @@ defmodule FileSniffer do
   end
 
   def type_from_binary(file_binary) do
-    sig = Map.keys(@signatures)
+    signature = Map.keys(@signatures)
     |> Enum.find(&(check_signature(file_binary, &1)))
-    @file_types[@signatures[sig]]
+    @file_types[@signatures[signature]]
   end
 
   def verify(file_binary, extension) do
