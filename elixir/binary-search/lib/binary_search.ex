@@ -18,18 +18,20 @@ defmodule BinarySearch do
   """
 
   @spec search(tuple, integer) :: {:ok, integer} | :not_found
+  def search({}, _), do: :not_found
+
   def search(numbers, key) do
     search(numbers, key, 0, tuple_size(numbers) - 1)
   end
 
-  defp search(_numbers, _key, min, max) when min > max, do: :not_found
+  defp search(_, _, min, max) when min > max, do: :not_found
 
   defp search(numbers, key, min, max) do
-    index = min + div(max - min, 2)
-    cond do
-      elem(numbers, index) == key -> {:ok, index}
-      elem(numbers, index) > key -> search(numbers, key, min, index - 1)
-      elem(numbers, index) < key -> search(numbers, key, index + 1, max)
+    index = min + div(max - min, 2) # protects against int overflow
+    case elem(numbers, index) do
+      el when el > key -> search(numbers, key, min, index - 1)
+      el when el < key -> search(numbers, key, index + 1, max)
+      _ -> {:ok, index}
     end
   end
 end
