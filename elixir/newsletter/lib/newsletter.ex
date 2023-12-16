@@ -18,6 +18,12 @@ defmodule Newsletter do
   end
 
   def send_newsletter(emails_path, log_path, send_fun) do
-    # Please implement the send_newsletter/3 function
+    log = open_log(log_path)
+
+    Enum.each(read_emails(emails_path), fn email ->
+      if send_fun.(email) == :ok do log_sent_email(log, email) end
+    end)
+
+    close_log(log)
   end
 end
