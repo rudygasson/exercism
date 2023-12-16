@@ -19,8 +19,11 @@ defmodule Newsletter do
   def send_newsletter(emails_path, log_path, send_fun) do
     log = open_log(log_path)
 
-    Enum.each(read_emails(emails_path), fn email ->
-      if send_fun.(email) == :ok do log_sent_email(log, email) end
+    read_emails(emails_path)
+    |> Enum.each(fn email ->
+      with :ok <- send_fun.(email) do
+        log_sent_email(log, email)
+      end
     end)
 
     close_log(log)
