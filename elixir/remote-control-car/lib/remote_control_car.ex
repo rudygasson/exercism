@@ -4,11 +4,7 @@ defmodule RemoteControlCar do
     battery_percentage: 100,
     distance_driven_in_meters: 0]
 
-  def new() do
-    %RemoteControlCar{nickname: "none"}
-  end
-
-  def new(nickname) do
+  def new(nickname \\ "none") do
     %RemoteControlCar{nickname: nickname}
   end
 
